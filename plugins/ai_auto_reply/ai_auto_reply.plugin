@@ -1,0 +1,62 @@
+from base_plugin import BasePlugin, HookResult
+from ui.settings import Header, Input, Switch, Text
+
+__id__ = "ai_auto_reply"
+__name__ = "AI Auto Reply"
+__description__ = "OpenRouter AI assistant for Telegram chats"
+__author__ = "kahusrinal"
+__version__ = "0.1.0"
+__icon__ = "exteraPlugins/1"
+__app_version__ = ">=12.5.1"
+__sdk_version__ = ">=1.4.4.3"
+__category__ = ["chats", "integrations"]
+
+class AIAutoReplyPlugin(BasePlugin):
+
+    def create_settings(self):
+        return [
+            Header(text="OpenRouter AI"),
+            Input(
+                key="api_key",
+                text="OpenRouter API Key",
+                default=""
+            ),
+            Input(
+                key="model",
+                text="AI Model",
+                default="openai/gpt-4o-mini"
+            ),
+            Header(text="Auto Reply"),
+            Switch(
+                key="enabled",
+                text="Enable AI",
+                default=False
+            ),
+            Switch(
+                key="groups",
+                text="Enable in groups",
+                default=False
+            ),
+            Switch(
+                key="approval",
+                text="Require approval",
+                default=True
+            ),
+            Text(
+                text="AI Auto Reply",
+                subtext="Diagnostic version. Automatic sending is not enabled yet."
+            )
+        ]
+
+    def on_plugin_load(self):
+        self.add_hook("TL_updateNewMessage")
+        self.logger.info("AI Auto Reply diagnostic started")
+
+    def on_update_hook(self, update_name, account, update):
+        if update_name == "TL_updateNewMessage":
+            message = getattr(update, "message", None)
+            self.logger.info(
+                "Incoming update detected; message_present=%s",
+                message is not None
+            )
+        return HookResult()
